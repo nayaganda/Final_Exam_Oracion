@@ -1,0 +1,27 @@
+---
+- name: Install MariaDB on Debian/Ubuntu
+  apt:
+    name: mariadb-server
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Ensure MariaDB running (Debian/Ubuntu)
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+  when: ansible_os_family == "Debian"
+
+- name: Install MariaDB on CentOS/RHEL
+  dnf:
+    name: mariadb-server
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure MariaDB running (CentOS/RHEL)
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+  when: ansible_os_family == "RedHat"
