@@ -1,0 +1,77 @@
+---
+# Debian/Ubuntu Nagios
+- name: Install Nagios and dependencies (Debian/Ubuntu)
+  apt:
+    name:
+      - apache2
+      - php
+      - libapache2-mod-php
+      - nagios4
+      - monitoring-plugins
+      - nagios-nrpe-plugin
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Ensure Nagios is started (Debian/Ubuntu)
+  service:
+    name: nagios4
+    state: started
+    enabled: true
+  when: ansible_os_family == "Debian"
+
+- name: Ensure Ubuntu Nagios directory exists
+  file:
+    path: /etc/nagios4
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == "Debian"
+
+- name: Create nagios web user (Debian)
+  command: htpasswd -b -c /etc/nagios4/htpasswd.users {{ nagios_web_user }} {{ nagios_web_pass }}
+  when: ansible_os_family == "Debian"
+
+- name: Restart apache after nagios config (Debian)
+  service:
+    name: apache2
+    state: restarted
+  when: ansible_os_family == "Debian"
+
+# CentOS / RedHat Nagios
+- name: Ensure epel-release installed (CentOS)
+  dnf:
+    name: epel-release
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install Nagios and dependencies (CentOS)
+  dnf:
+    name:
+      - httpd
+      - php
+      - nagios
+      - nagios-plugins-all
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure httpd and nagios running (CentOS)
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - httpd
+    - nagios
+  when: ansible_os_family == "RedHat"
+
+- name: Create nagios web user (CentOS)
+  command: htpasswd -b -c /etc/nagios/passwd {{ nagios_web_user }} {{ nagios_web_pass }}
+  args:
+    creates: /etc/nagios/passwd
+  when: ansible_os_family == "RedHat"
+
+- name: Restart httpd after nagios config (CentOS)
+  service:
+    name: httpd
+    state: restarted
+  when: ansible_os_family == "RedHat"

@@ -1,0 +1,4 @@
+mariadb_root_password: "nayaganda"
+nagios_web_user: "nagiosadmin"
+nagios_web_pass: "nayaganda"
+motd_user: "naya"
